@@ -1,20 +1,25 @@
 const xhr = new XMLHttpRequest();
 let TOKEN = '';
-let CHAT_ID = '';
+const API_KEY = 'da-ne-rotte';
 
-chrome.storage.sync.get('telegramSettings', data => {
-  const { token, chatId } = data.telegramSettings;
-  TOKEN = token || '';
-  CHAT_ID = chatId || '';
+chrome.storage.sync.get(null, data => {
+  TOKEN = data['general.token'] || '';
 });
 
 chrome.browserAction.onClicked.addListener(tab => {
-  xhr.open('POST', `https://api.telegram.org/bot${TOKEN}/sendMessage`, true);
+  xhr.open('POST', `https://telegram-read-later.now.sh/url`, true);
   xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.setRequestHeader('x-api-key', API_KEY);
   xhr.send(
     JSON.stringify({
-      text: tab.url,
-      chat_id: CHAT_ID
+      url: tab.url,
+      token: TOKEN
     })
   );
+  chrome.notifications.create(null, {
+    type: 'basic',
+    title: '🚀',
+    message: 'Sending this page to Telegram Read Me Later!',
+    iconUrl: './icon128.png'
+  });
 });
